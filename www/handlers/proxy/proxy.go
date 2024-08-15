@@ -72,7 +72,7 @@ func handle(p config.Proxy, c *cache.Cache, ctx *fiber.Ctx) error {
 
 		// cast interface returned from flight group to a proxyResponse
 		proxyResp, ok := response.(helpers.ProxyResponse)
-
+		
 		// sanity check to ensure cast worked properly
 		if !ok {
 			util.Error(str.CProxy, str.EProxyBadCast, p.Name, cacheKey)
@@ -142,6 +142,7 @@ func returnCachedTile(ctx *fiber.Ctx, p config.Proxy, tileUrl string, cachedTile
 
 	// remove delete list headers from final response
 	p.DoDeleteHeaders(ctx)
+	ctx.Set("Content-Encoding", "gzip")
 
 	return nil
 }

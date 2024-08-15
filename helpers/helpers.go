@@ -144,7 +144,7 @@ func FetchUpstream(tileUrl string, p config.Proxy) func() (interface{}, error) {
 
 		// set agent request URL
 		req.SetRequestURI(tileUrl)
-
+		
 		// inject headers to upstream request if any are configured
 		for _, header := range p.AddHeaders {
 			req.Header.Add(header.Name, header.Value)
@@ -207,20 +207,23 @@ func ProcessResponse(payload ProcessResponsePayload) error {
 		copy(tileData, payload.Response.Body)
 
 		headers := map[string]string{}
-		// Store configured headers into the tile cache for this tile
-		payload.Proxy.DoPullHeaders(payload.Response.Resp, headers)
+		headers["Content-Encoding"] = "gzip"
+		headers["Content-Type"] = "application/x-protobuf"
 
+		// Store configured headers into the tile cache for this tile
+		//payload.Proxy.DoPullHeaders(payload.Response.Resp, headers)
 		// write data to parent fiber request context if write mode is specified
 		if payload.WriteData {
 			// Delete headers from the final response that are on the DeleteHeaders list
 			// if we got them from the tileserver. This can be used to prevent leaking
 			// internals of the tileserver if you don't control what it returns
-			payload.Proxy.DoDeleteHeaders(payload.Ctx)
+			//payload.Proxy.DoDeleteHeaders(payload.Ctx)
 
 			// set 204 Status No Content if upstream tileserver returned no/empty tile
 			if payload.Response.Code == fiber.StatusNoContent {
 				payload.Ctx.Status(fiber.StatusNoContent)
 			}
+			payload.Ctx.Set("Content-Encoding", "gzip")
 
 			// write agent proxied response body to the response
 			_, err := payload.Ctx.Write(payload.Response.Body)
