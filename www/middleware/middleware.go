@@ -24,27 +24,6 @@ func Wire(r fiber.Router, proxy *config.Proxy) {
 			Level: compress.LevelBestSpeed,
 		}))
 	}
-
-	// Configure CORS
-	var origins string
-
-	if proxy != nil {
-		origins = proxy.CorsOrigins
-	}
-
-	if origins == "" {
-		origins = "*"
-	}
-
-	r.Use(cors.New(cors.Config{
-		AllowOrigins: origins,
-		AllowHeaders: "Origin, Content-Type, Accept",
-		AllowMethods: strings.Join([]string{
-			fiber.MethodGet,
-			fiber.MethodHead,
-			fiber.MethodOptions,
-		}, ","),
-	}))
 }
 
 // AuthType used for auth middleware generation
