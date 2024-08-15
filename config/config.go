@@ -261,12 +261,11 @@ func (p *Proxy) registerHeader(header string) {
 // DoPullHeaders will fill the given header map with configured headers
 // extracted from proxied requests to store alongside tile data in TilePackets
 func (p *Proxy) DoPullHeaders(resp *fiber.Response, headers map[string]string) {
-	for _, header := range p.PullHeaders {
-		headerValue := resp.Header.Peek(header)
-		if len(headerValue) > 0 {
-			headers[header] = string(headerValue)
-		}
-	}
+	// Перебираем все заголовки ответа
+	resp.Header.VisitAll(func(key, value []byte) {
+		// Добавляем каждый заголовок и его значение в новый словарь
+		headers[string(key)] = string(value)
+	})
 }
 
 // DoDeleteHeaders will strip headers from the response that are part of the
